@@ -346,6 +346,11 @@ Error OS_Unix::execute(const String &p_path, const List<String> &p_arguments, bo
 			args.push_back((char *)cs[i].get_data());
 		args.push_back(0);
 
+		fprintf(stderr, "Attempting to execute:");
+		for (int i = 0; i < args.size(); i++)
+			fprintf(stderr, " %s", args[i]);
+		fprintf(stderr, "\n");
+
 		execvp(p_path.utf8().get_data(), &args[0]);
 		// still alive? something failed..
 		fprintf(stderr, "**ERROR** OS_Unix::execute - Could not create child process while executing: %s\n", p_path.utf8().get_data());
