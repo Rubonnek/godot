@@ -132,19 +132,22 @@ def configure(env):
         env["LINK"] = "clang++"
 
     if env["use_ubsan"] or env["use_asan"] or env["use_tsan"]:
-        env.extra_suffix += "s"
+        env.extra_suffix += "."
 
         if env["use_ubsan"]:
             env.Append(CCFLAGS=["-fsanitize=undefined"])
             env.Append(LINKFLAGS=["-fsanitize=undefined"])
+            env.extra_suffix += "u"
 
         if env["use_asan"]:
             env.Append(CCFLAGS=["-fsanitize=address"])
             env.Append(LINKFLAGS=["-fsanitize=address"])
+            env.extra_suffix += "a"
 
         if env["use_tsan"]:
             env.Append(CCFLAGS=["-fsanitize=thread"])
             env.Append(LINKFLAGS=["-fsanitize=thread"])
+            env.extra_suffix += "t"
 
     ## Dependencies
 
