@@ -144,27 +144,32 @@ def configure(env):
         env.Append(LINKFLAGS=["-ftest-coverage", "-fprofile-arcs"])
 
     if env["use_ubsan"] or env["use_asan"] or env["use_lsan"] or env["use_tsan"] or env["use_msan"]:
-        env.extra_suffix += "s"
+        env.extra_suffix += "."
 
         if env["use_ubsan"]:
             env.Append(CCFLAGS=["-fsanitize=undefined"])
             env.Append(LINKFLAGS=["-fsanitize=undefined"])
+            env.extra_suffix += "u"
 
         if env["use_asan"]:
             env.Append(CCFLAGS=["-fsanitize=address"])
             env.Append(LINKFLAGS=["-fsanitize=address"])
+            env.extra_suffix += "a"
 
         if env["use_lsan"]:
             env.Append(CCFLAGS=["-fsanitize=leak"])
             env.Append(LINKFLAGS=["-fsanitize=leak"])
+            env.extra_suffix += "l"
 
         if env["use_tsan"]:
             env.Append(CCFLAGS=["-fsanitize=thread"])
             env.Append(LINKFLAGS=["-fsanitize=thread"])
+            env.extra_suffix += "t"
 
         if env["use_msan"]:
             env.Append(CCFLAGS=["-fsanitize=memory"])
             env.Append(LINKFLAGS=["-fsanitize=memory"])
+            env.extra_suffix += "m"
 
     if env["use_lto"]:
         if not env["use_llvm"] and env.GetOption("num_jobs") > 1:
