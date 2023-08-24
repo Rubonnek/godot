@@ -36,6 +36,9 @@
 class ParallaxBackground : public CanvasLayer {
 	GDCLASS(ParallaxBackground, CanvasLayer);
 
+	NodePath remote_node;
+	ObjectID cache;
+
 	Point2 offset;
 	real_t scale = 1.0;
 	Point2 base_offset;
@@ -51,11 +54,15 @@ class ParallaxBackground : public CanvasLayer {
 
 protected:
 	void _camera_moved(const Transform2D &p_transform, const Point2 &p_screen_offset);
+	void _update_cache();
 
 	void _notification(int p_what);
 	static void _bind_methods();
 
 public:
+	void set_remote_node(const NodePath &p_remote_node);
+	NodePath get_remote_node() const;
+
 	void set_scroll_offset(const Point2 &p_ofs);
 	Point2 get_scroll_offset() const;
 

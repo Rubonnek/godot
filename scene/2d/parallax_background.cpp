@@ -37,6 +37,8 @@ void ParallaxBackground::_notification(int p_what) {
 		case NOTIFICATION_ENTER_TREE: {
 			group_name = "__cameras_" + itos(get_viewport().get_id());
 			add_to_group(group_name);
+			_update_cache();
+
 		} break;
 
 		case NOTIFICATION_EXIT_TREE: {
@@ -46,10 +48,42 @@ void ParallaxBackground::_notification(int p_what) {
 }
 
 void ParallaxBackground::_camera_moved(const Transform2D &p_transform, const Point2 &p_screen_offset) {
-	screen_offset = p_screen_offset;
+	// Patch around issue https://github.com/godotengine/godot/issues/42586
+	// and around another issue we've stumbled upon
+	if (cache.is_valid()) {
+		set_offset(p_transform.get_origin());
+		Node2D *n = Object::cast_to<Node2D>(ObjectDB::get_instance(cache));
+		set_scroll_offset(n->get_position());
+	} else {
+		screen_offset = p_screen_offset;
 
-	set_scroll_scale(p_transform.get_scale().dot(Vector2(0.5, 0.5)));
-	set_scroll_offset(p_transform.get_origin());
+		set_scroll_scale(p_transform.get_scale().dot(Vector2(0.5, 0.5)));
+		set_scroll_offset(p_transform.get_origin());
+	}
+}
+
+void ParallaxBackground::set_remote_node(const NodePath &p_remote_node) {
+	remote_node = p_remote_node;
+	if (is_inside_tree()) {
+		_update_cache();
+	}
+
+	update_configuration_warnings();
+}
+
+void ParallaxBackground::_update_cache() {
+	cache = int64_t(0);
+	if (has_node(remote_node)) {
+		Node *node = get_node(remote_node);
+		if (!node || this == node) {
+			return;
+		}
+		cache = node->get_instance_id();
+	}
+}
+
+NodePath ParallaxBackground::get_remote_node() const {
+	return remote_node;
 }
 
 void ParallaxBackground::set_scroll_scale(real_t p_scale) {
@@ -163,6 +197,8 @@ Vector2 ParallaxBackground::get_final_offset() const {
 
 void ParallaxBackground::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("_camera_moved"), &ParallaxBackground::_camera_moved);
+	ClassDB::bind_method(D_METHOD("set_remote_node", "path"), &ParallaxBackground::set_remote_node);
+	ClassDB::bind_method(D_METHOD("get_remote_node"), &ParallaxBackground::get_remote_node);
 	ClassDB::bind_method(D_METHOD("set_scroll_offset", "offset"), &ParallaxBackground::set_scroll_offset);
 	ClassDB::bind_method(D_METHOD("get_scroll_offset"), &ParallaxBackground::get_scroll_offset);
 	ClassDB::bind_method(D_METHOD("set_scroll_base_offset", "offset"), &ParallaxBackground::set_scroll_base_offset);
@@ -177,6 +213,7 @@ void ParallaxBackground::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_ignore_camera_zoom"), &ParallaxBackground::is_ignore_camera_zoom);
 
 	ADD_GROUP("Scroll", "scroll_");
+	ADD_PROPERTY(PropertyInfo(Variant::NODE_PATH, "remote_path", PROPERTY_HINT_NODE_PATH_VALID_TYPES, "Node2D"), "set_remote_node", "get_remote_node");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "scroll_offset", PROPERTY_HINT_NONE, "suffix:px"), "set_scroll_offset", "get_scroll_offset");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "scroll_base_offset", PROPERTY_HINT_NONE, "suffix:px"), "set_scroll_base_offset", "get_scroll_base_offset");
 	ADD_PROPERTY(PropertyInfo(Variant::VECTOR2, "scroll_base_scale", PROPERTY_HINT_LINK), "set_scroll_base_scale", "get_scroll_base_scale");
