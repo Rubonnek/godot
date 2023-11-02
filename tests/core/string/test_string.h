@@ -350,18 +350,18 @@ TEST_CASE("[String] Substr") {
 
 TEST_CASE("[String] Find") {
 	String s = "Pretty Woman Woman";
-	CHECK(s.find("tty") == 3);
-	CHECK(s.find("Wo", 9) == 13);
-	CHECK(s.find("Revenge of the Monster Truck") == -1);
-	CHECK(s.rfind("man") == 15);
+	MULTICHECK_STRING_EQ(s, find, "tty", 3);
+	MULTICHECK_STRING_INT_EQ(s, find, "Wo", 9, 13);
+	MULTICHECK_STRING_EQ(s, find, "Revenge of the Monster Truck", -1);
+	MULTICHECK_STRING_EQ(s, rfind, "man", 15);
 }
 
 TEST_CASE("[String] Find no case") {
 	String s = "Pretty Whale Whale";
-	CHECK(s.findn("WHA") == 7);
-	CHECK(s.findn("WHA", 9) == 13);
-	CHECK(s.findn("Revenge of the Monster SawFish") == -1);
-	CHECK(s.rfindn("WHA") == 13);
+	MULTICHECK_STRING_EQ(s, findn, "WHA", 7);
+	MULTICHECK_STRING_INT_EQ(s, findn, "WHA", 9, 13);
+	MULTICHECK_STRING_EQ(s, findn, "Revenge of the Monster SawFish", -1);
+	MULTICHECK_STRING_EQ(s, rfindn, "WHA", 13);
 }
 
 TEST_CASE("[String] Find MK") {
@@ -382,11 +382,9 @@ TEST_CASE("[String] Find MK") {
 
 TEST_CASE("[String] Find and replace") {
 	String s = "Happy Birthday, Anna!";
-	s = s.replace("Birthday", "Halloween");
-	CHECK(s == "Happy Halloween, Anna!");
-
-	s = s.replace_first("H", "W");
-	CHECK(s == "Wappy Halloween, Anna!");
+	MULTICHECK_STRING_STRING_EQ(s, replace, "Birthday", "Halloween", "Happy Halloween, Anna!");
+	MULTICHECK_STRING_STRING_EQ(s, replace_first, "y", "Y", "HappY Birthday, Anna!");
+	MULTICHECK_STRING_STRING_EQ(s, replacen, "Y", "Y", "HappY BirthdaY, Anna!");
 }
 
 TEST_CASE("[String] Insertion") {
@@ -547,51 +545,52 @@ TEST_CASE("[String] String to float") {
 
 TEST_CASE("[String] Slicing") {
 	String s = "Mars,Jupiter,Saturn,Uranus";
-
 	const char *slices[4] = { "Mars", "Jupiter", "Saturn", "Uranus" };
-	for (int i = 0; i < s.get_slice_count(","); i++) {
-		CHECK(s.get_slice(",", i) == slices[i]);
-	}
+	MULTICHECK_GET_SLICE(s, ",", slices);
+}
+
+TEST_CASE("[String] Begins with") {
+	String s = "res://foobar";
+	MULTICHECK_STRING_EQ(s, begins_with, "res://", true);
+
+	s = "res";
+	MULTICHECK_STRING_EQ(s, begins_with, "res://", false);
+
+	s = "abc";
+	MULTICHECK_STRING_EQ(s, begins_with, "abc", true);
+}
+
+TEST_CASE("[String] Ends with") {
+	String s = "res://foobar";
+	MULTICHECK_STRING_EQ(s, ends_with, "foobar", true);
+
+	s = "res";
+	MULTICHECK_STRING_EQ(s, ends_with, "res://", false);
+
+	s = "abc";
+	MULTICHECK_STRING_EQ(s, ends_with, "abc", true);
 }
 
 TEST_CASE("[String] Splitting") {
 	String s = "Mars,Jupiter,Saturn,Uranus";
-	Vector<String> l;
-
 	const char *slices_l[3] = { "Mars", "Jupiter", "Saturn,Uranus" };
+	MULTICHECK_SPLIT(s, split, ",", true, 2, slices_l, 3);
+
 	const char *slices_r[3] = { "Mars,Jupiter", "Saturn", "Uranus" };
-	const char *slices_3[4] = { "t", "e", "s", "t" };
-
-	l = s.split(",", true, 2);
-	CHECK(l.size() == 3);
-	for (int i = 0; i < l.size(); i++) {
-		CHECK(l[i] == slices_l[i]);
-	}
-
-	l = s.rsplit(",", true, 2);
-	CHECK(l.size() == 3);
-	for (int i = 0; i < l.size(); i++) {
-		CHECK(l[i] == slices_r[i]);
-	}
+	MULTICHECK_SPLIT(s, rsplit, ",", true, 2, slices_r, 3);
 
 	s = "test";
-	l = s.split();
-	CHECK(l.size() == 4);
-	for (int i = 0; i < l.size(); i++) {
-		CHECK(l[i] == slices_3[i]);
-	}
+	const char *slices_3[4] = { "t", "e", "s", "t" };
+	MULTICHECK_SPLIT(s, split, "", true, 0, slices_3, 4);
 
 	s = "";
-	l = s.split();
-	CHECK(l.size() == 1);
-	CHECK(l[0] == "");
-
-	l = s.split("", false);
-	CHECK(l.size() == 0);
+	const char *slices_4[1] = { "" };
+	MULTICHECK_SPLIT(s, split, "", true, 0, slices_4, 1);
+	MULTICHECK_SPLIT(s, split, "", false, 0, slices_4, 0);
 
 	s = "Mars Jupiter Saturn Uranus";
 	const char *slices_s[4] = { "Mars", "Jupiter", "Saturn", "Uranus" };
-	l = s.split_spaces();
+	Vector<String> l = s.split_spaces();
 	for (int i = 0; i < l.size(); i++) {
 		CHECK(l[i] == slices_s[i]);
 	}
@@ -632,58 +631,6 @@ TEST_CASE("[String] Splitting") {
 	for (int i = 0; i < ii.size(); i++) {
 		CHECK(ii[i] == slices_i[i]);
 	}
-}
-
-struct test_27_data {
-	char const *data;
-	char const *part;
-	bool expected;
-};
-
-TEST_CASE("[String] Begins with") {
-	test_27_data tc[] = {
-		{ "res://foobar", "res://", true },
-		{ "res", "res://", false },
-		{ "abc", "abc", true }
-	};
-	size_t count = sizeof(tc) / sizeof(tc[0]);
-	bool state = true;
-	for (size_t i = 0; state && i < count; ++i) {
-		String s = tc[i].data;
-		state = s.begins_with(tc[i].part) == tc[i].expected;
-		if (state) {
-			String sb = tc[i].part;
-			state = s.begins_with(sb) == tc[i].expected;
-		}
-		CHECK(state);
-		if (!state) {
-			break;
-		}
-	};
-	CHECK(state);
-}
-
-TEST_CASE("[String] Ends with") {
-	test_27_data tc[] = {
-		{ "res://foobar", "foobar", true },
-		{ "res", "res://", false },
-		{ "abc", "abc", true }
-	};
-	size_t count = sizeof(tc) / sizeof(tc[0]);
-	bool state = true;
-	for (size_t i = 0; state && i < count; ++i) {
-		String s = tc[i].data;
-		state = s.ends_with(tc[i].part) == tc[i].expected;
-		if (state) {
-			String sb = tc[i].part;
-			state = s.ends_with(sb) == tc[i].expected;
-		}
-		CHECK(state);
-		if (!state) {
-			break;
-		}
-	};
-	CHECK(state);
 }
 
 TEST_CASE("[String] format") {
@@ -1462,39 +1409,62 @@ TEST_CASE("[String] Cyrillic to_lower()") {
 }
 
 TEST_CASE("[String] Count and countn functionality") {
-#define COUNT_TEST(x)             \
-	{                             \
-		bool success = x;         \
-		state = state && success; \
-	}
+	String s = String("");
+	MULTICHECK_STRING_EQ(s, count, "Test", 0);
 
-	bool state = true;
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, count, "", 0);
 
-	COUNT_TEST(String("").count("Test") == 0);
-	COUNT_TEST(String("Test").count("") == 0);
-	COUNT_TEST(String("Test").count("test") == 0);
-	COUNT_TEST(String("Test").count("TEST") == 0);
-	COUNT_TEST(String("TEST").count("TEST") == 1);
-	COUNT_TEST(String("Test").count("Test") == 1);
-	COUNT_TEST(String("aTest").count("Test") == 1);
-	COUNT_TEST(String("Testa").count("Test") == 1);
-	COUNT_TEST(String("TestTestTest").count("Test") == 3);
-	COUNT_TEST(String("TestTestTest").count("TestTest") == 1);
-	COUNT_TEST(String("TestGodotTestGodotTestGodot").count("Test") == 3);
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, count, "test", 0);
 
-	COUNT_TEST(String("TestTestTestTest").count("Test", 4, 8) == 1);
-	COUNT_TEST(String("TestTestTestTest").count("Test", 4, 12) == 2);
-	COUNT_TEST(String("TestTestTestTest").count("Test", 4, 16) == 3);
-	COUNT_TEST(String("TestTestTestTest").count("Test", 4) == 3);
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, count, "TEST", 0);
 
-	COUNT_TEST(String("Test").countn("test") == 1);
-	COUNT_TEST(String("Test").countn("TEST") == 1);
-	COUNT_TEST(String("testTest-Testatest").countn("tEst") == 4);
-	COUNT_TEST(String("testTest-TeStatest").countn("tEsT", 4, 16) == 2);
+	s = "TEST";
+	MULTICHECK_STRING_EQ(s, count, "TEST", 1);
 
-	CHECK(state);
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, count, "Test", 1);
 
-#undef COUNT_TEST
+	s = "aTest";
+	MULTICHECK_STRING_EQ(s, count, "Test", 1);
+
+	s = "Testa";
+	MULTICHECK_STRING_EQ(s, count, "Test", 1);
+
+	s = "TestTestTest";
+	MULTICHECK_STRING_EQ(s, count, "Test", 3);
+
+	s = "TestTestTest";
+	MULTICHECK_STRING_EQ(s, count, "TestTest", 1);
+
+	s = "TestGodotTestGodotTestGodot";
+	MULTICHECK_STRING_EQ(s, count, "Test", 3);
+
+	s = "TestTestTestTest";
+	MULTICHECK_STRING_INT_INT_EQ(s, count, "Test", 4, 8, 1);
+
+	s = "TestTestTestTest";
+	MULTICHECK_STRING_INT_INT_EQ(s, count, "Test", 4, 12, 2);
+
+	s = "TestTestTestTest";
+	MULTICHECK_STRING_INT_INT_EQ(s, count, "Test", 4, 16, 3);
+
+	s = "TestTestTestTest";
+	MULTICHECK_STRING_INT_EQ(s, count, "Test", 4, 3);
+
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, countn, "test", 1);
+
+	s = "Test";
+	MULTICHECK_STRING_EQ(s, countn, "TEST", 1);
+
+	s = "testTest-Testatest";
+	MULTICHECK_STRING_EQ(s, countn, "tEst", 4);
+
+	s = "testTest-TeStatest";
+	MULTICHECK_STRING_INT_INT_EQ(s, countn, "tEsT", 4, 16, 2);
 }
 
 TEST_CASE("[String] Bigrams") {
@@ -1667,9 +1637,9 @@ TEST_CASE("[String] Strip edges") {
 
 TEST_CASE("[String] Trim") {
 	String s = "aaaTestbbb";
-	CHECK(s.trim_prefix("aaa") == "Testbbb");
-	CHECK(s.trim_suffix("bbb") == "aaaTest");
-	CHECK(s.trim_suffix("Test") == s);
+	MULTICHECK_STRING_EQ(s, trim_prefix, "aaa", "Testbbb");
+	MULTICHECK_STRING_EQ(s, trim_suffix, "bbb", "aaaTest");
+	MULTICHECK_STRING_EQ(s, trim_suffix, "Test", s);
 }
 
 TEST_CASE("[String] Right/Left") {
