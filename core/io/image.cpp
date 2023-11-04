@@ -2849,7 +2849,7 @@ void Image::blit_rect_mask(const Ref<Image> &p_src, const Ref<Image> &p_mask, co
 
 	int pixel_size = get_format_pixel_size(format);
 
-	Ref<Image> msk = p_mask;
+	const Ref<Image> &msk = p_mask;
 
 	for (int i = 0; i < dest_rect.size.y; i++) {
 		for (int j = 0; j < dest_rect.size.x; j++) {
@@ -2886,7 +2886,7 @@ void Image::blend_rect(const Ref<Image> &p_src, const Rect2i &p_src_rect, const 
 		return;
 	}
 
-	Ref<Image> img = p_src;
+	const Ref<Image> &img = p_src;
 
 	for (int i = 0; i < dest_rect.size.y; i++) {
 		for (int j = 0; j < dest_rect.size.x; j++) {
@@ -2926,8 +2926,8 @@ void Image::blend_rect_mask(const Ref<Image> &p_src, const Ref<Image> &p_mask, c
 		return;
 	}
 
-	Ref<Image> img = p_src;
-	Ref<Image> msk = p_mask;
+	const Ref<Image> &img = p_src;
+	const Ref<Image> &msk = p_mask;
 
 	for (int i = 0; i < dest_rect.size.y; i++) {
 		for (int j = 0; j < dest_rect.size.x; j++) {

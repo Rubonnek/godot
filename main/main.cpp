@@ -1758,7 +1758,7 @@ Error Main::setup(const char *execpath, int argc, char *argv[], bool p_second_ph
 #endif
 
 		String default_driver = driver_hints.get_slice(",", 0);
-		String default_driver_macos = default_driver;
+		const String &default_driver_macos = default_driver;
 #if defined(GLES3_ENABLED) && defined(EGL_STATIC) && defined(MACOS_ENABLED)
 		default_driver_macos = "opengl3_angle"; // Default to ANGLE if it's built-in.
 #endif

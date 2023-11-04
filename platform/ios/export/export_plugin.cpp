@@ -882,7 +882,7 @@ Error EditorExportPlatformIOS::_walk_dir_recursive(Ref<DirAccess> &p_da, FileHan
 	p_da->list_dir_end();
 
 	for (int i = 0; i < dirs.size(); ++i) {
-		String dir = dirs[i];
+		const String &dir = dirs[i];
 		p_da->change_dir(dir);
 		Error err = _walk_dir_recursive(p_da, p_handler, p_userdata);
 		p_da->change_dir("..");
@@ -1212,7 +1212,7 @@ Error EditorExportPlatformIOS::_copy_asset(const String &p_out_dir, const String
 
 Error EditorExportPlatformIOS::_export_additional_assets(const String &p_out_dir, const Vector<String> &p_assets, bool p_is_framework, bool p_should_embed, Vector<IOSExportAsset> &r_exported_assets) {
 	for (int f_idx = 0; f_idx < p_assets.size(); ++f_idx) {
-		String asset = p_assets[f_idx];
+		const String &asset = p_assets[f_idx];
 		if (!asset.begins_with("res://")) {
 			// either SDK-builtin or already a part of the export template
 			IOSExportAsset exported_asset = { asset, p_is_framework, p_should_embed };

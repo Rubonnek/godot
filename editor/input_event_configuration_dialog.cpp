@@ -200,7 +200,7 @@ void InputEventConfigurationDialog::_on_listen_input_changed(const Ref<InputEven
 	}
 
 	// Create an editable reference and a copy of full event.
-	Ref<InputEvent> received_event = p_event;
+	const Ref<InputEvent> &received_event = p_event;
 	Ref<InputEvent> received_original_event = received_event->duplicate();
 
 	// Check what the type is and if it is allowed.

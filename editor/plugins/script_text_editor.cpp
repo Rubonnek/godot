@@ -802,7 +802,7 @@ void ScriptEditor::_update_modified_scripts_for_external_editor(Ref<Script> p_fo
 	}
 
 	for (const Ref<Script> &E : scripts) {
-		Ref<Script> scr = E;
+		const Ref<Script> &scr = E;
 
 		if (p_for_script.is_valid() && p_for_script != scr) {
 			continue;

@@ -2238,7 +2238,7 @@ Ref<TextFile> ScriptEditor::_load_text_file(const String &p_path, Error *r_error
 }
 
 Error ScriptEditor::_save_text_file(Ref<TextFile> p_text_file, const String &p_path) {
-	Ref<TextFile> sqscr = p_text_file;
+	const Ref<TextFile> &sqscr = p_text_file;
 	ERR_FAIL_COND_V(sqscr.is_null(), ERR_INVALID_PARAMETER);
 
 	String source = sqscr->get_text();

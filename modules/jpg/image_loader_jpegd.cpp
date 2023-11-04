@@ -156,7 +156,7 @@ public:
 
 static Error _jpgd_save_to_output_stream(jpge::output_stream *p_output_stream, const Ref<Image> &p_img, float p_quality) {
 	ERR_FAIL_COND_V(p_img.is_null() || p_img->is_empty(), ERR_INVALID_PARAMETER);
-	Ref<Image> image = p_img;
+	const Ref<Image> &image = p_img;
 	if (image->get_format() != Image::FORMAT_RGB8) {
 		image->convert(Image::FORMAT_RGB8);
 	}

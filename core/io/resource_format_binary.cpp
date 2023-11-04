@@ -1399,7 +1399,7 @@ Error ResourceFormatLoaderBinary::rename_dependencies(const String &p_path, cons
 		}
 
 		if (p_map.has(path)) {
-			String np = p_map[path];
+			const String &np = p_map[path];
 			path = np;
 		}
 

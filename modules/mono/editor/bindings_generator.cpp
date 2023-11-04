@@ -158,7 +158,7 @@ String BindingsGenerator::bbcode_to_xml(const String &p_bbcode, const TypeInterf
 
 	DocTools *doc = EditorHelp::get_doc_data();
 
-	String bbcode = p_bbcode;
+	const String &bbcode = p_bbcode;
 
 	StringBuilder xml_output;
 

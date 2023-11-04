@@ -120,7 +120,7 @@ Error ResourceSaver::save(const Ref<Resource> &p_resource, const String &p_path,
 
 		String local_path = ProjectSettings::get_singleton()->localize_path(path);
 
-		Ref<Resource> rwcopy = p_resource;
+		const Ref<Resource> &rwcopy = p_resource;
 		if (p_flags & FLAG_CHANGE_PATH) {
 			rwcopy->set_path(local_path);
 		}
@@ -154,7 +154,7 @@ Error ResourceSaver::save(const Ref<Resource> &p_resource, const String &p_path,
 }
 
 Error ResourceSaver::set_uid(const String &p_path, ResourceUID::ID p_uid) {
-	String path = p_path;
+	const String &path = p_path;
 
 	ERR_FAIL_COND_V_MSG(path.is_empty(), ERR_INVALID_PARAMETER, "Can't update UID to empty path. Provide non-empty path.");
 
