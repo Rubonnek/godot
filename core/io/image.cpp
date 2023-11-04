@@ -2849,14 +2849,12 @@ void Image::blit_rect_mask(const Ref<Image> &p_src, const Ref<Image> &p_mask, co
 
 	int pixel_size = get_format_pixel_size(format);
 
-	const Ref<Image> &msk = p_mask;
-
 	for (int i = 0; i < dest_rect.size.y; i++) {
 		for (int j = 0; j < dest_rect.size.x; j++) {
 			int src_x = src_rect.position.x + j;
 			int src_y = src_rect.position.y + i;
 
-			if (msk->get_pixel(src_x, src_y).a != 0) {
+			if (p_mask->get_pixel(src_x, src_y).a != 0) {
 				int dst_x = dest_rect.position.x + j;
 				int dst_y = dest_rect.position.y + i;
 
