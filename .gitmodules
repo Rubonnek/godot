@@ -1,0 +1,3 @@
+[submodule "modules/limboai"]
+	path = modules/limboai
+	url = ssh://git@git.rubonnek.net:41022/Rubonnek-LLC/limboai.git
