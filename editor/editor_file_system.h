@@ -181,6 +181,7 @@ class EditorFileSystem : public Node {
 
 	void _scan_filesystem();
 
+	Mutex late_update_files_mutex;
 	HashSet<String> late_update_files;
 
 	void _save_late_updated_files();
