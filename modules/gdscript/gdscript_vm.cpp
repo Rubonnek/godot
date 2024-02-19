@@ -680,6 +680,8 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				GET_VARIANT_PTR(b, 1);
 				GET_VARIANT_PTR(dst, 2);
 				// Compute signatures (types of operands) so it can be optimized when matching.
+				static Mutex op_signature_mutex;
+				MutexLock lock(op_signature_mutex);
 				uint32_t op_signature = _code_ptr[ip + 5];
 				uint32_t actual_signature = (a->get_type() << 8) | (b->get_type());
 
